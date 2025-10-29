@@ -1,0 +1,20 @@
+# INSTRUKCJA RESTARTU SERWERA
+# Wykonaj te kroki w terminalu PowerShell:
+
+# 1. Zatrzymaj wszystkie procesy Python na porcie 8000:
+Get-Process | Where-Object {$_.ProcessName -eq "python"} | Stop-Process -Force
+
+# 2. Poczekaj 2 sekundy:
+Start-Sleep -Seconds 2
+
+# 3. Uruchom serwer ponownie:
+.\venv\Scripts\python.exe -m uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+
+# 4. Otwórz w przeglądarce:
+#    http://localhost:8000/
+#    LUB
+#    http://localhost:8000/index.html
+
+# 5. Jeśli nadal widzisz JSON, zrób hard refresh w przeglądarce:
+#    Ctrl + Shift + R  (lub Ctrl + F5)
+

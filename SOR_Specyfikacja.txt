@@ -1,0 +1,228 @@
+SOR – System Oceny Rozmów Konsultantów
+1) WSTĘP 
+Co to jest?
+SOR to aplikacja, która automatycznie ocenia rozmowy telefoniczne w call center: w sprzedaży, obsłudze klienta, retencji i windykacji. Zamiast ręcznie odsłuchiwać rozmowy, dostajesz gotowy raport: punkty za konkretne kategorie, cytaty (dowody) z rozmowy, opis emocji klienta i konsultanta oraz jasne wnioski.
+Skąd bierzemy rozmowy?
+SOR łączy się z centralami telefonicznymi (PBX/VoIP; np. Genesys, Avaya, Cisco, Twilio, Asterisk, 3CX, Xcally) i pobiera nagrania automatycznie według reguł/harmonogramu. Możesz też wgrać pliki MP3/WAV ręcznie.
+Co dokładnie robi system?
+Po pobraniu nagrania SOR:
+1.	robi transkrypcję (dźwięk → tekst),
+2.	wykonuje diaryzację (rozpoznaje kto mówi i kiedy),
+3.	ocenia rozmowę wg karty (kategorie z wagami),
+4.	przypisuje punkty (1–5; 2 i 4 powstają „pomiędzy”),
+5.	dołącza dowody (cytaty z czasem i mówcą),
+6.	opisuje sentyment (emocje) klienta i konsultanta na początku/końcu,
+7.	buduje raport końcowy.
+Czego NIE robi?
+Nie sprawdza zgodności z wewnętrznymi procedurami i nie korzysta z baz wiedzy firmy. Oceniamy styl rozmowy, jasność, empatię, logikę i skuteczność.
+________________________________________
+2) FUNKCJONALNOŚCI (opis szczegółowy + mini-przykłady)
+2.1 Automatyczny import rozmów
+•	Integracje z PBX/VoIP/API, harmonogramy (np. co 15 min), filtry (kolejka, agent, data).
+•	Metadane: data, czas trwania, identyfikator agenta, numer/kanał.
+•	Przykład: Rozmowy z kolejki „Service_PL” wpadają automatycznie do „kolejki ocen”.
+2.2 Transkrypcja + diarizacja
+•	Dokładny tekst z rozbiciem na KLIENT/KONSULTANT i z timestampami.
+•	Przykład cytatu: 00:02:18 – KONSULTANT: „Proszę otworzyć Ustawienia → Hasło. Poczekam.”
+2.3 Karty oceny (Scorecards)
+•	Zestaw kategorii (z wagami), Category Promptów i punktów 1–3–5.
+•	Przykład: „Identyfikacja problemu (20%) — 1: brak pytań, 3: częściowe dopytanie, 5: trafne pytania + podsumowanie.”
+2.4 Globalny System Prompt (ustawia styl)
+„Analizuj rozmowy konsultant–klient pod kątem jakości komunikacji: jasność przekazu, empatia, logika diagnozy i skuteczność pomocy. Nie oceniaj zgodności z procedurami. Każdą kategorię oceń w skali 1–5, gdzie 1 = bardzo słabo, 3 = poprawnie, 5 = wzorowo. Dla każdej kategorii podaj krótki komentarz i 1–2 cytaty (z czasem). Na końcu opisz emocje klienta i konsultanta: nastroje na początku/końcu oraz krótki opis trendu.”
+2.5 Category Prompty (na kategorię)
+•	Zawierają cel oceny i punkty 1–3–5 (2/4 interpolowane).
+•	Przykład (Rozwiązanie sprawy): 1: brak pomocy; 3: częściowe; 5: jasne, pełne rozwiązanie + upewnienie.
+2.6 Skala 1–3–5 (dlaczego)
+•	1 – słabo; 3 – poprawnie; 5 – wzorowo.
+•	2 i 4 pojawiają się, gdy zachowanie jest „pomiędzy”. To daje spójność i mniej sporów.
+2.7 Dowody (Cytaty)
+•	Krótkie fragmenty z rozmowy z czasem i mówcą (pozytywne/negatywne).
+•	Wymagania minimalne cytatów można ustawić na kategorię (np. diag. = 2 cytaty).
+2.8 Frazy (opcjonalne)
+•	Obowiązkowe: ich brak → kara (np. −1 pkt).
+•	Zakazane: ich użycie → kara (np. −3 pkt) lub hard-fail (np. sufit wyniku 60%).
+•	Przykład: „Czy mogę w czymś jeszcze pomóc?” (obowiązkowa).
+2.9 Reguły (Rules Engine)
+•	Proste IF–THEN po ocenie.
+•	Przykłady:
+– brak frazy obowiązkowej → −1 pkt globalnie,
+– fraza krytyczna zakazana → wynik maks. 60%,
+– poprawa sentymentu klienta > +0.5 → bonus +3%.
+2.10 Sentyment (emocje)
+•	Osobno Klient i Konsultant: start, koniec, delta, trend + 1 cytat.
+•	Skala −1..+1. Nie miesza się z wynikiem (chyba że dodasz regułę bonusu).
+•	Przykład: Klient −0.6 → +0.4 (delta +1.0) „Dziękuję, teraz już działa.”
+2.11 Raport końcowy
+•	Wynik %, tabela kategorii, cytaty, frazy użyte/brak, sentyment, krótki komentarz.
+•	Eksport PDF/XLS, API do zewnętrznych systemów.
+2.12 Własne karty (Custom Scorecards)
+•	Tworzenie własnych kategorii, wag, opisów punktów 1–3–5, fraz i reguł.
+•	Zapisywanie presetów firmowych (np. „Bank_PL_2025_Service”).
+________________________________________
+3) PRESETY SYSTEMOWE (pełne; z Category Prompt + punkty 1–3–5)
+Notacja punktów: 1 = słabo, 3 = poprawnie, 5 = wzorowo. Oceny 2/4 są pośrednie.
+3.1 SPRZEDAŻ (SALES)
+1.	Powitanie i prezentacja (10%)
+Category Prompt: Oceń naturalność powitania i pierwsze wrażenie.
+Punkty: 1 – brak powitania/ton chłodny („Słucham?”); 3 – formalne („Dzień dobry, dział sprzedaży”); 5 – naturalne i przyjazne („Dzień dobry, Anna z działu sprzedaży, jak mogę pomóc?”).
+2.	Badanie potrzeb (20%)
+Category Prompt: Sprawdź, czy konsultant rozumie potrzeby klienta (pytania otwarte, parafraza).
+Punkty: 1 – nie pyta; 3 – pojedyncze pytania; 5 – pogłębione pytania + podsumowanie („Czy dobrze rozumiem, że zależy Panu na niższej racie?”).
+3.	Prezentacja oferty (20%)
+Category Prompt: Oceń, czy oferta jest przedstawiona jasno, korzyściowo i adekwatnie.
+Punkty: 1 – chaotyczna; 3 – poprawna; 5 – korzyściowa, dopasowana.
+4.	Zarządzanie obiekcjami (15%)
+Category Prompt: Sprawdź reakcję na wątpliwości (spokój, logika, empatia).
+Punkty: 1 – unika/ucina; 3 – neutralnie; 5 – rzeczowo i spokojnie, z argumentami.
+5.	Zamknięcie sprzedaży (15%)
+Category Prompt: Oceń naturalne poprowadzenie do decyzji (bez presji).
+Punkty: 1 – brak podsumowania; 3 – formalne zakończenie; 5 – domknięcie i potwierdzenie kolejnego kroku.
+6.	Soft-skills (10%)
+Category Prompt: Oceń ton, energię, budowanie relacji, życzliwość.
+Punkty: 1 – chłodno; 3 – poprawnie; 5 – pozytywnie i aktywnie.
+7.	Jasność przekazu (10%)
+Category Prompt: Oceń prostotę i logikę wypowiedzi (bez żargonu).
+Punkty: 1 – zawiły język; 3 – zrozumiale; 5 – bardzo klarownie, krok po kroku.
+________________________________________
+3.2 OBSŁUGA KLIENTA (SERVICE)
+1.	Powitanie i ton (10%)
+Category Prompt: Oceń pierwsze wrażenie i ton.
+Punkty: 1 – brak powitania/zimno; 3 – formalnie; 5 – ciepło, naturalnie.
+2.	Identyfikacja problemu (20%)
+Category Prompt: Sprawdź, czy konsultant naprawdę zrozumiał zgłoszenie (trafne pytania, potwierdzenie).
+Punkty: 1 – nie pyta; 3 – częściowe dopytanie; 5 – trafne pytania + parafraza.
+3.	Rozwiązanie sprawy (25%)
+Category Prompt: Oceń skuteczność i jasność pomocy (kroki, upewnienie efektu).
+Punkty: 1 – brak pomocy; 3 – częściowo; 5 – pełne rozwiązanie i upewnienie („Działa?”).
+4.	Jasność komunikacji (15%)
+Category Prompt: Oceń prosty język, tempo, prowadzenie krok po kroku.
+Punkty: 1 – żargon; 3 – poprawnie; 5 – prosto i cierpliwie („Ja poczekam.”).
+5.	Finalizacja rozmowy (15%)
+Category Prompt: Oceń domknięcie i pozytywne zakończenie.
+Punkty: 1 – nagle; 3 – formalnie; 5 – podsumowanie + propozycja dalszej pomocy.
+6.	Soft-skills (15%)
+Category Prompt: Oceń empatię, cierpliwość, reagowanie na emocje.
+Punkty: 1 – chłodno/poirytowanie; 3 – neutralnie; 5 – spokojnie i empatycznie.
+________________________________________
+3.3 RETENCJA (RETENTION)
+1.	Powitanie i ton (10%)
+Category Prompt: Oceń otwarcie rozmowy i gotowość do dialogu.
+Punkty: 1 – chłodno; 3 – poprawnie; 5 – przyjaźnie i profesjonalnie.
+2.	Identyfikacja przyczyny rezygnacji (20%)
+Category Prompt: Sprawdź, czy ustalono faktyczny powód odejścia (bez zgadywania).
+Punkty: 1 – zgaduje/unika; 3 – częściowo; 5 – trafna diagnoza + potwierdzenie.
+3.	Argumenty za pozostaniem (25%)
+Category Prompt: Oceń dopasowane, racjonalne argumenty umieszczone w kontekście potrzeb klienta.
+Punkty: 1 – brak/ogólniki; 3 – wyliczanka zalet; 5 – trafne i logiczne.
+4.	Oferta utrzymaniowa (20%)
+Category Prompt: Oceń realność i atrakcyjność propozycji (bez wchodzenia w procedury).
+Punkty: 1 – brak; 3 – ogólnikowa; 5 – dopasowana i zrozumiała.
+5.	Radzenie sobie z obiekcjami (10%)
+Category Prompt: Oceń spokój, empatię i logiczną odpowiedź na sprzeciw.
+Punkty: 1 – nerwowo/ucieka; 3 – formalnie; 5 – rzeczowo i spokojnie.
+6.	Soft-skills (10%)
+Category Prompt: Oceń ton, relację i szacunek.
+Punkty: 1 – chłodno; 3 – neutralnie; 5 – ciepło, naturalnie.
+7.	Finalizacja (5%)
+Category Prompt: Oceń pozytywne domknięcie i jasne zakończenie rozmowy.
+Punkty: 1 – pośpiesznie; 3 – formalnie; 5 – spokojnie i pozytywnie.
+________________________________________
+3.4 WINDYKACJA (COLLECTIONS)
+1.	Identyfikacja klienta (10%)
+Category Prompt: Oceń sposób i pewność potwierdzenia rozmówcy (bez wchodzenia w procedury).
+Punkty: 1 – brak; 3 – częściowo; 5 – w pełni i spokojnie.
+2.	Zrozumienie sytuacji (10%)
+Category Prompt: Sprawdź, czy konsultant rozumie przyczynę zaległości i kontekst rozmówcy.
+Punkty: 1 – nie pyta; 3 – ogólnikowo; 5 – trafnie i rzeczowo.
+3.	Ton i postawa (10%)
+Category Prompt: Oceń spokój, szacunek i stanowczość (bez agresji).
+Punkty: 1 – agresywnie; 3 – neutralnie; 5 – spokojnie i profesjonalnie.
+4.	Propozycja rozwiązania (20%)
+Category Prompt: Oceń, czy propozycja jest zrozumiała i realistyczna.
+Punkty: 1 – brak; 3 – ogólna; 5 – konkretna i jasna.
+5.	Konkretność rozmowy (25%)
+Category Prompt: Oceń, czy rozmowa prowadzi do konkretnych ustaleń.
+Punkty: 1 – chaotycznie; 3 – częściowo; 5 – jasno do decyzji.
+6.	Soft-skills (15%)
+Category Prompt: Oceń cierpliwość i szacunek dla rozmówcy.
+Punkty: 1 – niemiło; 3 – poprawnie; 5 – rzeczowo i z klasą.
+7.	Finalizacja (10%)
+Category Prompt: Oceń profesjonalne, zrozumiałe zakończenie.
+Punkty: 1 – nagle; 3 – neutralnie; 5 – pozytywnie i stanowczo.
+________________________________________
+4) WZÓR LICZENIA WYNIKU
+Dla każdej kategorii:
+(ocena 1–5 / 5) × waga% = punkty_kategorii
+Wynik końcowy = suma punktów_kategorii (0–100).
+Ocena literowa (domyślnie): A ≥ 85%, B 75–84%, C 60–74%, D < 60%.
+Reguły i frazy modyfikują wynik po zsumowaniu (np. hard-fail).
+________________________________________
+5) PRZYKŁADOWE RAPORTY (2 kompletne)
+5.1 SERVICE – „Reset hasła w aplikacji mobilnej”
+Agent: Anna Kowalska · Czas: 05:20 · Hard-fail: brak
+Frazy: obowiązkowa „Czy mogę w czymś jeszcze pomóc?” – użyta; zakazane – brak.
+Kategoria	Waga	Ocena	Punkty	Cytat (dowód)	Komentarz
+Powitanie i ton	10%	5	10	„Dzień dobry, Anna z obsługi klienta, jak mogę pomóc?” (00:00:03)	Ciepły start.
+Identyfikacja problemu	20%	4	16	„Czy komunikat pojawia się po wpisaniu hasła?” (00:00:45)	Trafna diagnoza, można było dopytać o poprzednie próby.
+Rozwiązanie sprawy	25%	5	25	„Zresetowałam dostęp. Proszę zalogować się ponownie.” (00:02:40)	Pełne rozwiązanie.
+Jasność komunikacji	15%	4	12	„Krok po kroku przejdziemy Ustawienia → Hasło. Ja poczekam.” (00:02:10)	Klarownie.
+Finalizacja	15%	5	15	„Czy wszystko działa? W czym jeszcze mogę pomóc?” (00:05:15)	Wzorowe domknięcie.
+Soft-skills	15%	5	15	„Rozumiem, że to stresujące, już pomagam.” (00:01:20)	Empatia i spokój.
+Sentyment – klient: −0.5 → +0.4 (Δ +0.9, poprawa) · Cytat: „Dziękuję, teraz już działa.”
+Sentyment – konsultant: +0.2 → +0.8 (Δ +0.6, stabilny wzrost)
+Wynik końcowy: 93% → A
+Komentarz AI: „Wzorowe prowadzenie, bardzo dobre domknięcie. Minimalnie zwolnić tempo przy pierwszej instrukcji.”
+________________________________________
+5.2 SALES – „Oferta pakietu rodzinnego”
+Agent: Marek Nowak · Czas: 06:10 · Hard-fail: brak
+Frazy: obowiązkowa „Czy mogę w czymś jeszcze pomóc?” – użyta; zakazane – brak.
+Kategoria	Waga	Ocena	Punkty	Cytat (dowód)	Komentarz
+Powitanie i prezentacja	10%	4	8	„Dzień dobry, Marek z działu sprzedaży.” (00:00:04)	Poprawnie, mogło być cieplej.
+Badanie potrzeb	20%	5	20	„Na czym Panu najbardziej zależy — na cenie, internecie w telefonie czy TV?” (00:00:50)	Dobre pytania otwarte + parafraza.
+Prezentacja oferty	20%	4	16	„Pakiet rodzinny obniża koszty przy 3 numerach.” (00:02:10)	Korzyściowo, można dodać przykład oszczędności.
+Zarządzanie obiekcjami	15%	4	12	„Rozumiem obawę o umowę — sprawdźmy elastyczne opcje.” (00:03:20)	Spokojnie i rzeczowo.
+Zamknięcie sprzedaży	15%	3	9	„Czy chciałby Pan, abym przesłał podsumowanie?” (00:05:30)	Neutralnie; brak wyraźnego domknięcia.
+Soft-skills	10%	5	10	„Chcę dobrać to tak, żeby Panu pasowało.” (00:01:40)	Bardzo dobry ton.
+Jasność przekazu	10%	4	8	„W skrócie: 3 numery = niższa rata za każdy.” (00:02:35)	Zrozumiale.
+Sentyment – klient: −0.1 → +0.3 (Δ +0.4, lekka poprawa)
+Sentyment – konsultant: +0.3 → +0.6 (Δ +0.3)
+Wynik końcowy: 83% → B
+Komentarz AI: „Świetne potrzeby i soft-skills; wzmocnić domknięcie (jasny ‘call to action’).”
+________________________________________
+6) WIDOK KARTY OCENY (formularz do wypełnienia)
+Metadane rozmowy
+•	Nazwa rozmowy / Id nagrania
+•	Agent (imię i nazwisko / ID)
+•	Data i czas trwania
+•	Typ rozmowy (Sales/Service/Retention/Collections)
+•	Język analizy
+Ustawienia karty
+•	Nazwa karty (preset)
+•	Globalny System Prompt (tekst)
+•	Skala ocen: 1–5 (2 i 4 pośrednie)
+Sekcja kategorii (powtarzana dla każdej kategorii)
+•	Nazwa kategorii
+•	Waga (%)
+•	Category Prompt (tekst)
+•	Punkty 1 — opis zachowania słabego
+•	Punkty 3 — opis zachowania poprawnego
+•	Punkty 5 — opis zachowania wzorowego
+•	Ocena (1–5)
+•	Uzasadnienie (1–2 zdania)
+•	Dowody (Cytat 1: mówca + timestamp + treść; Cytat 2 opcjonalny)
+Frazy (opcjonalnie)
+•	Obowiązkowe: [lista]; brak → kara (x pkt)
+•	Zakazane: [lista]; użycie → kara (x pkt) / hard-fail (limit wyniku %)
+Sentyment
+•	Klient: start / koniec / delta / krótki opis trendu (+ cytat)
+•	Konsultant: start / koniec / delta / krótki opis trendu (+ cytat)
+Podsumowanie
+•	Wynik końcowy (%)
+•	Ocena literowa (A/B/C/D)
+•	Komentarz końcowy (2–4 zdania)
+________________________________________
+7) WZÓR FRAZ I REGUŁ (opcjonalny moduł)
+Frazy – przykłady (Service):
+•	Obowiązkowa: „Czy mogę w czymś jeszcze pomóc?” → brak = −1 pkt
+•	Zakazana: „To nie mój problem.” → −3 pkt lub hard-fail (max 60%)
+________________________________________

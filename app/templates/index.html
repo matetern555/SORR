@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SOR - System Oceny Rozmów</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>🎤 System Oceny Rozmów</h1>
+        
+        <!-- SEKCJA 0: Historia rozmów -->
+        <section id="history-section">
+            <h2>📚 Historia rozmów</h2>
+            <div id="conversations-list" class="conversations-list">
+                <p>Ładowanie historii...</p>
+            </div>
+        </section>
+        
+        <!-- SEKCJA 1: Upload Audio -->
+        <section id="upload-section">
+            <h2>📤 Nowa rozmowa</h2>
+            
+            <div class="upload-area" id="upload-area">
+                <p>📁 Przeciągnij plik audio lub kliknij aby wybrać</p>
+                <input type="file" id="audio-file" accept="audio/*" hidden>
+                <p class="file-name" id="file-name" style="display:none;"></p>
+            </div>
+            
+            <!-- Przycisk analizy (ukryty do czasu uploadu) -->
+            <button id="process-btn" class="btn-primary" style="display:none;" disabled>
+                🚀 Rozpocznij analizę
+            </button>
+        </section>
+        
+        <!-- SEKCJA 2: Status przetwarzania -->
+        <section id="processing-section" style="display:none;">
+            <h2>⏳ Przetwarzanie...</h2>
+            
+            <div class="progress-steps">
+                <div class="step pending" id="step-transcription">
+                    <span class="step-icon">📝</span>
+                    <span class="step-label">Transkrypcja</span>
+                    <span class="step-status" id="status-transcription">Oczekiwanie...</span>
+                </div>
+                
+                <div class="step pending" id="step-diarization">
+                    <span class="step-icon">👥</span>
+                    <span class="step-label">Diaryzacja mówców</span>
+                    <span class="step-status" id="status-diarization">Oczekiwanie...</span>
+                </div>
+                
+                <div class="step pending" id="step-evaluation">
+                    <span class="step-icon">⭐</span>
+                    <span class="step-label">Ocena rozmowy</span>
+                    <span class="step-status" id="status-evaluation">Oczekiwanie...</span>
+                </div>
+            </div>
+            
+            <div class="progress-bar">
+                <div class="progress-fill" id="progress-fill"></div>
+            </div>
+        </section>
+        
+        <!-- SEKCJA 3: Przyciski wyników (po zakończeniu) -->
+        <section id="results-section" style="display:none;">
+            <h2>✅ Wyniki analizy</h2>
+            
+            <button id="back-to-history" class="btn-primary" style="margin-bottom: 20px;" onclick="showHistory()">
+                ← Powrót do historii
+            </button>
+            
+            <div class="results-buttons">
+                <button id="show-transcription" class="btn-secondary">
+                    📝 Wyświetl transkrypcję
+                </button>
+                
+                <button id="show-diarization" class="btn-secondary">
+                    👥 Wyświetl diaryzację
+                </button>
+                
+                <button id="show-evaluation" class="btn-secondary">
+                    ⭐ Wyświetl ocenę
+                </button>
+            </div>
+        </section>
+        
+        <!-- SEKCJA 4: Wyświetlanie wyników -->
+        <div id="transcription-view" class="result-view" style="display:none;">
+            <h3>📝 Transkrypcja</h3>
+            <pre id="transcription-text"></pre>
+        </div>
+        
+        <div id="diarization-view" class="result-view" style="display:none;">
+            <h3>👥 Diaryzacja mówców</h3>
+            <div id="diarization-segments"></div>
+        </div>
+        
+        <div id="evaluation-view" class="result-view" style="display:none;">
+            <h3>⭐ Ocena rozmowy</h3>
+            <div id="evaluation-results"></div>
+        </div>
+    </div>
+    
+    <script src="/static/js/processor.js"></script>
+    <script src="/static/js/main.js"></script>
+    <script>
+        // Upewnij się że funkcja startProcessing jest dostępna
+        if (typeof startProcessing === 'undefined') {
+            console.error('Funkcja startProcessing nie jest zdefiniowana!');
+        }
+    </script>
+</body>
+</html>

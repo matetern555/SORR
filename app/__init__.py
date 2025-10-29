@@ -1,0 +1,5 @@
+# Plik inicjalizacyjny pakietu app
+
+
+
+
