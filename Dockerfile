@@ -7,8 +7,9 @@ WORKDIR /app
 # Skopiuj plik zależności
 COPY requirements.txt .
 
-# Zainstaluj zależności
-RUN pip install --no-cache-dir -r requirements.txt
+# Zaktualizuj pip i zainstaluj zależności
+RUN pip install --no-cache-dir --upgrade pip \
+    && pip install --no-cache-dir -r requirements.txt
 
 # Skopiuj całą aplikację
 COPY . .
