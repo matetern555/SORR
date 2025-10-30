@@ -48,15 +48,18 @@ def transcribe_with_speaker_diarization_async(audio_file: BinaryIO, language: st
         deepgram_language = language_map.get(language, "en")
         
         print("Wysyłanie żądania do Deepgram...")
-        # Deepgram v5 - NIE podajemy encoding, pozwalamy API wykryć format automatycznie
-        # Deepgram automatycznie wykrywa format audio na podstawie danych
-        response = deepgram.listen.v1.media.transcribe_file(
-            request=audio_data,
-            model="nova-2",
-            language=deepgram_language,
-            punctuate=True,
-            smart_format=True,
-            diarize=True  # Włącz diaryzację mówców
+        # Deepgram SDK v3 – używamy endpointu prerecorded v("1")
+        file_source = {"buffer": audio_data}
+        options = {
+            "model": "nova-2",
+            "language": deepgram_language,
+            "punctuate": True,
+            "smart_format": True,
+            "diarize": True,
+        }
+        response = deepgram.listen.prerecorded.v("1").transcribe_file(
+            file_source,
+            options,
         )
         
         print("Otrzymano odpowiedź z Deepgram")
